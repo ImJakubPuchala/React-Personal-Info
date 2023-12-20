@@ -1,4 +1,4 @@
-##[Link to page](https://imjakubpuchala.github.io/React-Personal-Info/)
+[Link to page](https://imjakubpuchala.github.io/React-Personal-Info/)
 
 # Getting Started with Create React App
 
