@@ -12,11 +12,11 @@ function App() {
   const [lastName, setLastName] = useState<string>('');
   const [emailAddress, setEmailAddress] = useState<string>('');
   const [age, setAge] = useState<number>(8);
-  const [file, setFile] = useState<any>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
 
-  const time = [
+  const time : string[] = [
     '12:00',
     '14:00',
     '16:30',
@@ -44,7 +44,7 @@ function App() {
     formData.append('lastName', lastName);
     formData.append('email', emailAddress);
     formData.append('age', age.toString());
-    formData.append('file', file);
+    if(file) formData.append('file', file);
     formData.append('selectedDate', selectedDate);
     formData.append('selectedTime', selectedTime);
 
@@ -56,7 +56,7 @@ function App() {
         })
           .then(response => {
             if (!response.ok) {
-              throw new Error('N/W Error');
+              throw new Error(`N/W error! Status Error: ${response.status}`);
             }
             return response.json();
           })
@@ -118,7 +118,7 @@ function App() {
         <div className="col-span-1">
         {
           time.map(
-            (e : any, i : number)=>
+            (e : string, i : number)=>
               <div key={"TimeSlots" + i} onClick={()=>setSelectedTime(e)}>
                 <TimeSlots time={e} selected={selectedTime == e ? true : false} props={{}}/>
               </div>

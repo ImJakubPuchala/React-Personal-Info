@@ -1,19 +1,22 @@
+import { ChangeEvent } from "react";
 import DeleteIcons from "../deleteIcons/deleteIcons";
 
 interface IUploadFileProps {
-    value : any,
+    value : File | null,
     setValue : any,
 }
 
 
 export default function UploadFile({ value, setValue } : IUploadFileProps) {
-    const handleFileInputChange = (e:any) => {
-        const selectedFile = e.target.files[0];
+    const handleFileInputChange = (e : ChangeEvent<HTMLInputElement>) => {
+        if(e.target.files){
+            const selectedFile = e.target.files[0];
     
-        if (selectedFile) {
-            setValue(selectedFile);
+            if (selectedFile) {
+                setValue(selectedFile);
+            }
         }
-      };
+    };
 
     return (
         <div className="pt-6 flex flex-col items-center justify-center w-full">

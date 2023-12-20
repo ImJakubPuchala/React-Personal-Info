@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import WarningIcons from '../warningIcons/WarningIcons';
 
 interface TextfieldProps {
@@ -47,7 +47,7 @@ export default function Textfield({ value, setValue, label, type, required, ...p
                 
                 rounded-md shadow-sm
             `}
-            onChange={handleChange}
+            onChange={(e : ChangeEvent<HTMLInputElement>)=>setValue(e.target.value)}
             value={value}
             placeholder=""
         />

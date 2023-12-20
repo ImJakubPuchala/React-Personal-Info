@@ -13,13 +13,23 @@ interface ICalendarWithHoliday{
     holidayName: string
 }
 
+interface HolidayData {
+    country: string;
+    iso: string;
+    year: number;
+    date: string;
+    day: string;
+    name: string;
+    type: string;
+}
+
 export default function CalendarForm({value, setValue} : ICalselectedDay){
     const [displayCaledar, setDisplayCalendar] = useState<ICalendarWithHoliday[][]>([[]]);
     const [displayMonthYear, setDisplayMonthYear] = useState<string>('');
     const [month, setMonth] = useState<number>(new Date().getMonth());
     const [year, setYear] = useState<number>(new Date().getFullYear());
 
-    const getCalendar = async () => {
+    const getHolidayFromApi = async () => {
         let country = 'pl'
         let url = 'https://api.api-ninjas.com/v1/holidays?country=' + country + '&year=' + year + '&type=national_holiday'
 
@@ -35,45 +45,55 @@ export default function CalendarForm({value, setValue} : ICalselectedDay){
                     headers: headers
                 }
             );
-
             if (!response.ok) {
-              throw new Error('N/W Error');
+                throw new Error(`N/W error! Status Error: ${response.status}`);
             }
-        
-            const holidays = await response.json();
+            const data: HolidayData[] = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching data: ', error);
+            return [];
+        }
+    }
 
-            let date = new Date();
-            date.setMonth(month);
-            date.setFullYear(year);
-            let c = new Calendar(1);
-            let m : Number[][] = c.monthDays(year, month);
-            setDisplayMonthYear(date.toLocaleString('default', {month: 'long'}) + ' ' + date.getFullYear());
-    
-            let calendarWithHolidays : ICalendarWithHoliday[][] = [[]];
-    
-            for (var i = 0; i < m.length; i++) {
-                var dayArray : ICalendarWithHoliday[] = [];
-                for (var j = 0; j < m[i].length; j++) {
-                    var dateValue = m[i][j];
-                    dayArray.push({ 
-                        date: Number(dateValue), 
-                        isActive: !holidays.find(
-                            (e : any) => {
-                                if(e.date === year + '-' + (month + 1) + '-' + dateValue || e.date === year + '-' + '0' + (month + 1) + '-' + dateValue){
-                                    return true
-                                }else{
-                                    return false
-                                }
-                            }), 
-                        fulldate : year + '-' + (month + 1) + '-' + dateValue, 
-                        holidayName: '' 
-                    });
+    const getCalendar = async () => {
+        try {
+            getHolidayFromApi()
+             .then(data => {
+                const holidays = data
+
+                let date = new Date();
+                date.setMonth(month);
+                date.setFullYear(year);
+                let c = new Calendar(1);
+                let m : Number[][] = c.monthDays(year, month);
+                setDisplayMonthYear(date.toLocaleString('default', {month: 'long'}) + ' ' + date.getFullYear());
+        
+                let calendarWithHolidays : ICalendarWithHoliday[][] = [[]];
+        
+                for (var i = 0; i < m.length; i++) {
+                    var dayArray : ICalendarWithHoliday[] = [];
+                    for (var j = 0; j < m[i].length; j++) {
+                        var dateValue = m[i][j];
+                        dayArray.push({ 
+                            date: Number(dateValue), 
+                            isActive: !holidays.find(
+                                (e : HolidayData) => {
+                                    if(e.date === year + '-' + (month + 1) + '-' + dateValue || e.date === year + '-' + '0' + (month + 1) + '-' + dateValue){
+                                        return true
+                                    }else{
+                                        return false
+                                    }
+                                }), 
+                            fulldate : year + '-' + (month + 1) + '-' + dateValue, 
+                            holidayName: '' 
+                        });
+                    }
+                    calendarWithHolidays.push(dayArray);
                 }
-                calendarWithHolidays.push(dayArray);
-            }
-    
-            setDisplayCalendar(calendarWithHolidays);
-            
+        
+                setDisplayCalendar(calendarWithHolidays);
+            })             
         } catch (error) {
             console.error('Error:', error);
         }
@@ -126,17 +146,17 @@ export default function CalendarForm({value, setValue} : ICalselectedDay){
                 </thead>
                 <tbody className="text-center">
                     {
-                        displayCaledar.map((week : any, i : number) => (
+                        displayCaledar.map((week : ICalendarWithHoliday[], i : number) => (
                             <tr key={i}>
                                 {
-                                    week.map((day : any, j : number) => (
+                                    week.map((day : ICalendarWithHoliday, j : number) => (
                                         <td key={j} 
-                                            style={day.isActive && day.date != '0' && j != 6? {} : {color : 'gray'}}
+                                            style={day.isActive && day.date != 0 && j != 6? {} : {color : 'gray'}}
                                             className={day.fulldate === value? 'bg-purple-500 text-white rounded-full' : ''}
                                             title={day.holidayName}
                                             onClick={
                                                 () => {
-                                                    if(day.isActive && day.date != '0' && j != 6){
+                                                    if(day.isActive && day.date != 0 && j != 6){
                                                         setValue(year + '-' + Number(month+1) + '-' + day.date)
                                                     }
                                                 }
