@@ -32,9 +32,10 @@ export default function CalendarForm({value, setValue} : ICalselectedDay){
     const getHolidayFromApi = async () => {
         let country = 'pl'
         let url = 'https://api.api-ninjas.com/v1/holidays?country=' + country + '&year=' + year + '&type=national_holiday'
-
+        
+        
         const headers = {
-            'X-Api-Key': '123'
+            'X-Api-Key': process.env.REACT_APP_API_KEY? process.env.REACT_APP_API_KEY : ''
         }
 
         try {
