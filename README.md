@@ -1,3 +1,7 @@
+React-Personal-Info
+
+The React-Personal-Info application is a form created using the React library and the Tailwind CSS framework to create a user interface. It focuses on collecting basic personal information.
+
 [Link to page](https://imjakubpuchala.github.io/React-Personal-Info/)
 
 # Getting Started with Create React App
